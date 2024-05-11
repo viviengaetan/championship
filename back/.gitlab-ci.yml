@@ -1,0 +1,130 @@
+workflow:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+          when: never
+        # NO DEPLOYMENT
+        - if: '$CI_COMMIT_TAG == null'
+          variables:
+              IMAGE_TAG: $CI_COMMIT_REF_SLUG-$CI_COMMIT_SHORT_SHA
+              CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$IMAGE_TAG
+        - if: '$CI_COMMIT_TAG =~ /(alpha)|(beta)|(rc)/'
+          variables:
+              IMAGE_TAG: $CI_COMMIT_TAG
+              CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$IMAGE_TAG
+              ENVIRONMENT: 'staging'
+        # STAGING/PRODUCTION - tags only
+        - if: '$CI_COMMIT_TAG'
+          variables:
+              IMAGE_TAG: $CI_COMMIT_TAG
+              CONTAINER_IMAGE: $CI_REGISTRY_IMAGE:$IMAGE_TAG
+              ENVIRONMENT: 'production'
+
+
+variables:
+    SRC_ROOT_PATH: /app
+
+stages:
+    - build
+    - sast
+    - test
+    - deploy
+
+# ###########################################
+# Build
+# ###########################################
+build:application_test:
+    extends: .build:image
+    stage: build
+    variables:
+        BUILD_TARGET: app_php_dev
+        BUILD_IMAGE_DESTINATION: ${CONTAINER_IMAGE}_dev
+        BUILD_ARGS: ""
+
+# ###########################################
+# SAST
+# ###########################################
+php:lint:
+  image: "${CONTAINER_IMAGE}_dev"
+  stage: sast
+  variables:
+    GIT_STRATEGY: none
+  script:
+  - cd $SRC_ROOT_PATH
+  - vendor/bin/parallel-lint . --exclude vendor
+security:advisories:
+  image: viviengaetan69/docker-local-php-security-checker:0.1.5
+  stage: sast
+  script:
+  - cd app
+  - local-php-security-checker --format=junit src > $CI_PROJECT_DIR/report-security-checker.xml
+  artifacts:
+    reports:
+      junit:
+      - "$CI_PROJECT_DIR/report-security-checker.xml"
+  rules:
+  - exists:
+    - app/composer.lock
+php:checkstyle:
+  image: "${CONTAINER_IMAGE}_dev"
+  stage: sast
+  variables:
+    GIT_STRATEGY: none
+  script:
+  - cd $SRC_ROOT_PATH
+  - cp phpcs.xml.dist phpcs.xml
+  - vendor/bin/phpcs --report=junit > $CI_PROJECT_DIR/report-phpcs.xml
+  artifacts:
+    reports:
+      junit:
+      - "$CI_PROJECT_DIR/report-phpcs.xml"
+  rules:
+  - exists:
+    - app/phpcs.xml.dist
+php:stan:
+  image: "${CONTAINER_IMAGE}_dev"
+  stage: sast
+  variables:
+    GIT_STRATEGY: none
+    PHP_MEMORY_LIMIT: 256M
+  script:
+  - cd $SRC_ROOT_PATH
+  - vendor/bin/phpstan analyse --no-progress --error-format=junit > $CI_PROJECT_DIR/report-phpstan.xml
+  artifacts:
+    reports:
+      junit:
+      - "$CI_PROJECT_DIR/report-phpstan.xml"
+  rules:
+  - exists:
+    - app/phpstan.neon
+
+php:unit:
+  image: "${CONTAINER_IMAGE}_dev"
+  variables:
+    APP_ENV: test
+    XDEBUG_MODE: coverage
+    GIT_STRATEGY: none
+    SRC_ROOT_PATH: "/app"
+  script:
+  - cd $SRC_ROOT_PATH
+  - vendor/bin/phpunit --coverage-text --colors=never --log-junit="${CI_PROJECT_DIR}"/report-phpunit.xml
+  coverage: "/^\\s*Lines:\\s*\\d+.\\d+\\%/"
+  artifacts:
+    reports:
+      junit: "./report-phpunit.xml"
+  rules:
+  - exists:
+    - app/phpunit.xml.dist
+
+# ###########################################
+# Deploy
+# ###########################################
+build:application:
+    extends: .build:image
+    stage: deploy
+    rules:
+        - if: '$CI_COMMIT_TAG'
+          when: on_success
+    variables:
+        BUILD_TARGET: app_php
+        BUILD_IMAGE_DESTINATION: $CONTAINER_IMAGE
+        BUILD_ARGS: ""
