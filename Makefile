@@ -26,7 +26,6 @@ build: ## Builds the Docker images
 
 up: ## Start the docker hub in detached mode (no logs)
 	@$(DOCKER_COMP) up --detach
-	@$(PHP_CONT) bash -c "symfony-installer"
 
 start: build up ## Build and start the containers
 

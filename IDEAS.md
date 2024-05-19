@@ -1,12 +1,12 @@
 ## Front
 
 - Use: https://github.com/kuzeofficial/next-hexagonal-architecture
-- Github Actions
+- GitHub Actions
 
 ## Back
 
 - Use: https://github.com/mtarld/apip-ddd
-- Github Actions
+- GitHub Actions
 - Swoole (https://medium.com/beyn-technology/wars-of-symfony-runtimes-a-performance-odyssey-7b0120e8f9e1)
 - Add a Varnish for list / item
 

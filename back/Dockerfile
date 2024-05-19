@@ -11,6 +11,7 @@ USER root
 
 # Extra extension if needed
 #RUN install-php-extensions pdo_mysql zip
+RUN install-php-extensions pdo_pgsql
 
 ENV PHP_MEMORY_LIMIT="128M"
 
@@ -50,8 +51,7 @@ RUN rm $PHP_INI_DIR/conf.d/app.prod.ini; \
     mv "$PHP_INI_DIR/php.ini-development" "$PHP_INI_DIR/php.ini";
 COPY docker/fpm/app.dev.ini $PHP_INI_DIR/conf.d/
 
-RUN install-php-extensions xdebug-stable; \
-    install-packages default-mysql-client;
+RUN install-php-extensions xdebug-stable;
 
 USER application
 
