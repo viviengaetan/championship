@@ -27,4 +27,4 @@ Listening on: http://localhost/
 
 ## Ideas
 
-[List](./IDEAS.md)
+[List](doc/IDEAS.md)

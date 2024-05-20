@@ -19,8 +19,13 @@ doctrine:
             Tournament:
                 type: attribute
                 is_bundle: false
-                dir: '%kernel.project_dir%/src/Tournament/Domain/Model'
-                prefix: 'Tournament\Domain\Model'
+                prefix: 'App\Tournament\Domain'
+                dir: '%kernel.project_dir%/src/Tournament/Domain'
+            Shared:
+                type: attribute
+                is_bundle: false
+                prefix: 'App\Shared\Domain'
+                dir: '%kernel.project_dir%/src/Shared/Domain'
         controller_resolver:
             auto_mapping: true
 

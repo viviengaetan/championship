@@ -11,6 +11,9 @@
 - Add a Varnish for list / item
 
 ## Objects
+[Diagram](class_diagram.md)
+
+https://github.com/spatie/schema-org
 
 Team
 - name
