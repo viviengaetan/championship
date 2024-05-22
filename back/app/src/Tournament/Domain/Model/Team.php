@@ -14,7 +14,7 @@ class Team
     #[ORM\Embedded(columnPrefix: false)]
     private readonly TeamId $id;
 
-    function __construct(
+    public function __construct(
         #[ORM\Embedded(columnPrefix: false)]
         private readonly TeamName $name
     ) {
