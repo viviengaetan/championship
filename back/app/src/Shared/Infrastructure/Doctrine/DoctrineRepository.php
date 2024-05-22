@@ -6,7 +6,7 @@ namespace App\Shared\Infrastructure\Doctrine;
 
 use Doctrine\ORM\EntityManagerInterface;
 
-class DoctrineRepository
+abstract class DoctrineRepository
 {
     public function __construct(
         protected EntityManagerInterface $entityManager

@@ -8,11 +8,18 @@ framework:
             # https://symfony.com/doc/current/messenger.html#transport-configuration
             # async: '%env(MESSENGER_TRANSPORT_DSN)%'
             # failed: 'doctrine://default?queue_name=failed'
-            # sync: 'sync://'
-
+            sync: 'sync://'
+        default_bus: 'query.bus'
+        buses:
+            command.bus:
+                middleware:
+                    - 'messenger.middleware.doctrine_transaction'
+            query.bus:
         routing:
             # Route your messages to the transports
             # 'App\Message\YourMessage': async
+            'App\Shared\Application\Query\QueryInterface': 'sync'
+            'App\Shared\Application\Command\CommandInterface': 'sync'
 
 # when@test:
 #    framework:

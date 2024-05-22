@@ -16,7 +16,6 @@ final readonly class TeamItemProvider implements ProviderInterface
 {
     public function __construct(
         private QueryBusInterface $queryBus,
-        // todo https://github.com/mtarld/apip-ddd/blob/7693a1d448a35b98e04f57aeb687c616120c1197/src/Shared/Infrastructure/Symfony/Messenger/MessengerQueryBus.php
     ) {
     }
 

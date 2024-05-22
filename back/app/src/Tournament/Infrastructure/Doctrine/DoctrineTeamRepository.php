@@ -10,7 +10,7 @@ use App\Tournament\Domain\Repository\TeamRepositoryInterface;
 use App\Tournament\Domain\ValueObject\TeamId;
 use Doctrine\ORM\EntityManagerInterface;
 
-class DoctrineTeamRepository extends DoctrineRepository implements TeamRepositoryInterface
+final class DoctrineTeamRepository extends DoctrineRepository implements TeamRepositoryInterface
 {
     private const string ENTITY_CLASS = Team::class;
 

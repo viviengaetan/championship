@@ -7,7 +7,7 @@ namespace App\Tournament\Domain\Exception;
 use App\Tournament\Domain\ValueObject\TeamId;
 use Throwable;
 
-class MissingTeamException extends \RuntimeException
+final class MissingTeamException extends \RuntimeException
 {
     public function __construct(TeamId $teamId, int $code = 0, ?Throwable $previous = null)
     {
